@@ -25,13 +25,9 @@ var merge = function(a, b) {
 };
 |}]
 
-external fold_left : ('a -> 'b -> 'a) -> 'a -> 'b Js.Dict.t -> 'a = "fold_left" [@@bs.val]
-
+external fold_left : ('a -> 'b -> 'a) -> 'a -> 'b Js.Dict.t -> 'a = "fold_left"
 external fold_left_keys : ('a -> string -> 'b -> 'a) -> 'a -> 'b Js.Dict.t -> 'a = "fold_left_keys"
-  [@@bs.val]
-
-external merge : 'a Js.Dict.t -> 'a Js.Dict.t -> 'a Js.Dict.t = "merge" [@@bs.val]
-
+external merge : 'a Js.Dict.t -> 'a Js.Dict.t -> 'a Js.Dict.t = "merge"
 external unsafe_from_object : 'a Js.t -> 'b Js.Dict.t = "%identity"
 
 let insert =
@@ -46,7 +42,7 @@ module type TRAVERSABLE_F = functor (A : APPLICATIVE) ->
 module Functor : FUNCTOR with type 'a t = 'a Js.Dict.t = struct
   type 'a t = 'a Js.Dict.t
 
-  let map f a = Js.Dict.map (fun [@bs] x -> f x) a
+  let map f a = Js.Dict.map ~f:(fun [@u] x -> f x) a
 end
 
 module Apply : APPLY with type 'a t = 'a Js.Dict.t = struct
@@ -72,7 +68,6 @@ module Foldable : FOLDABLE with type 'a t = 'a Js.Dict.t = struct
   type 'a t = 'a Js.Dict.t
 
   let fold_left = fold_left
-
   and fold_right f init a = ArrayLabels.fold_right ~f ~init (Js.Dict.values a)
 
   module Fold_Map (M : MONOID) = struct
@@ -121,13 +116,10 @@ functor
   ->
   struct
     type 'a t = 'a Js.Dict.t
-
     and 'a applicative_t = 'a A.t
 
     include (Functor : FUNCTOR with type 'a t := 'a t)
-
     include (Foldable : FOLDABLE with type 'a t := 'a t)
-
     module I = Infix.Apply (A)
 
     let traverse_with_index f a =
@@ -141,7 +133,6 @@ functor
 
     module D = Default.Sequence (struct
       type 'a t = 'a Js.Dict.t
-
       and 'a applicative_t = 'a A.t
 
       let traverse = traverse

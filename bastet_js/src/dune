@@ -3,4 +3,5 @@
  (modes melange)
  (libraries bastet)
  (public_name bastet.js)
- (preprocess (pps melange.ppx)))
+ (preprocess
+  (pps melange.ppx)))
